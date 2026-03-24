@@ -2,7 +2,7 @@
 name: Build Python 3.14 Wheels
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # checkov:skip=CKV_GHA_7:Version input is required to select which release to build
     inputs:
       version:
         description: "pylibCZIrw version to build"
