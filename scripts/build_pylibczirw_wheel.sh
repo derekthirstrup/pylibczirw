@@ -22,7 +22,7 @@ WORKDIR="$(mktemp -d "${TMPDIR:-/tmp}/pylibczirw-build-XXXXXX")"
 OUTDIR="${3:-$(pwd)/dist}"
 
 cleanup() {
-    rm -rf "${WORKDIR}"
+	rm -rf "${WORKDIR}"
 }
 trap cleanup EXIT
 
@@ -32,7 +32,7 @@ echo "Output directory: ${OUTDIR}"
 # Clone repository
 echo "Cloning pylibczirw v${VERSION}..."
 git clone --recursive --branch "v${VERSION}" --depth 1 \
-    https://github.com/ZEISS/pylibczirw.git "${WORKDIR}"
+	https://github.com/ZEISS/pylibczirw.git "${WORKDIR}"
 
 cd "${WORKDIR}"
 
@@ -43,7 +43,7 @@ sed -i.bak "s/VERSION = \"0.0.0\"/VERSION = \"${VERSION}\"/" setup.py && rm -f s
 echo "Creating build environment..."
 uv venv --python="${PYTHON}" .venv
 uv pip install --python .venv/bin/python \
-    build setuptools wheel packaging xmltodict validators numpy cmake
+	build setuptools wheel packaging xmltodict validators numpy cmake
 
 # Build the wheel
 echo "Building wheel..."
