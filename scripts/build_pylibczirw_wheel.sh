@@ -2,6 +2,7 @@
 # Build a pylibCZIrw wheel for Python 3.14 from source.
 #
 # Prerequisites:
+#   - uv (install via: curl -LsSf https://astral.sh/uv/install.sh | sh)
 #   - Python 3.14 (install via: uv python install cpython-3.14.0rc2)
 #   - cmake, gcc/g++ (C++17), libssl-dev, zlib1g-dev
 #   - git (for cloning with submodules)
@@ -17,7 +18,7 @@ set -euo pipefail
 
 VERSION="${1:-6.0.1}"
 PYTHON="${2:-python3.14}"
-WORKDIR="/tmp/pylibczirw-build-$$"
+WORKDIR="$(mktemp -d "${TMPDIR:-/tmp}/pylibczirw-build-XXXXXX")"
 OUTDIR="${3:-$(pwd)/dist}"
 
 cleanup() {
