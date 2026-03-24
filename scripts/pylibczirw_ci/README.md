@@ -20,6 +20,7 @@ uv python install cpython-3.14.0rc2
 ## CI workflow
 
 The `build-wheels-py314.yml` workflow builds wheels for:
+
 - Linux x86_64
 - Windows x64
 

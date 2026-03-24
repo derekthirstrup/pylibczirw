@@ -17,8 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      PYLIBCZIRW_VERSION: ${{ inputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -34,7 +36,7 @@ jobs:
       - name: Build wheel
         run: |
           chmod +x scripts/build_pylibczirw_wheel.sh
-          ./scripts/build_pylibczirw_wheel.sh "${{ inputs.version }}" python3.14
+          ./scripts/build_pylibczirw_wheel.sh "${PYLIBCZIRW_VERSION}" python3.14
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
@@ -47,8 +49,10 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read
+    env:
+      PYLIBCZIRW_VERSION: ${{ inputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -59,7 +63,7 @@ jobs:
       - name: Clone and build pylibCZIrw
         shell: pwsh
         run: |
-          $version = "${{ inputs.version }}"
+          $version = $env:PYLIBCZIRW_VERSION
           $workdir = "$env:RUNNER_TEMP\pylibczirw-build"
 
           Write-Host "Building pylibCZIrw $version for Python 3.14"

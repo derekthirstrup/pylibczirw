@@ -20,7 +20,7 @@ PYTHON="${2:-python3.14}"
 WORKDIR="/tmp/pylibczirw-build-$$"
 OUTDIR="${3:-$(pwd)/dist}"
 
-echo "Building pylibCZIrw ${VERSION} wheel for $(${PYTHON} --version)"
+echo "Building pylibCZIrw ${VERSION} wheel for $("${PYTHON}" --version)"
 echo "Output directory: ${OUTDIR}"
 
 # Clone repository
@@ -47,7 +47,7 @@ echo "Building wheel..."
 mkdir -p "${OUTDIR}"
 cp dist/*.whl "${OUTDIR}/"
 
-WHEEL_NAME=$(ls dist/*.whl | xargs basename)
+WHEEL_NAME="$(basename dist/*.whl)"
 echo ""
 echo "Success! Built: ${OUTDIR}/${WHEEL_NAME}"
 
