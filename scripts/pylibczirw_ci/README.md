@@ -5,12 +5,12 @@ Pre-built wheels for pylibCZIrw with Python 3.14 support.
 ## Background
 
 pylibCZIrw does not yet publish official Python 3.14 wheels. These were built
-from source (v6.0.1) with pybind11 v3.0.1+ which adds Python 3.14 support.
+from source (v6.0.1) with pybind11 v3.0.0+ which adds Python 3.14 support.
 
 ## Building locally
 
 ```bash
-# Install Python 3.14
+# Install Python 3.14 (update version as needed)
 uv python install cpython-3.14.0rc2
 
 # Build the wheel

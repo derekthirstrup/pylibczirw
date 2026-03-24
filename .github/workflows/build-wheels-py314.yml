@@ -11,6 +11,9 @@ on:
 
 permissions: {}
 
+env:
+  PYTHON_VERSION: "cpython-3.14.0rc2"
+
 jobs:
   build-linux:
     name: Build Linux x86_64 wheel
@@ -26,7 +29,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install Python 3.14
-        run: uv python install cpython-3.14.0rc2
+        run: uv python install "$PYTHON_VERSION"
 
       - name: Install build dependencies
         run: |
@@ -58,7 +61,13 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install Python 3.14
-        run: uv python install cpython-3.14.0rc2
+        run: uv python install "$env:PYTHON_VERSION"
+
+      - name: Setup vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+          C:\vcpkg\bootstrap-vcpkg.bat
+          echo "VCPKG_INSTALLATION_ROOT=C:\vcpkg" >> $env:GITHUB_ENV
 
       - name: Clone and build pylibCZIrw
         shell: pwsh
@@ -77,7 +86,7 @@ jobs:
           (Get-Content setup.py) -replace 'VERSION = "0.0.0"', "VERSION = `"$version`"" | Set-Content setup.py
 
           # Create venv and install deps
-          uv venv --python=cpython-3.14.0rc2 .venv
+          uv venv --python="$env:PYTHON_VERSION" .venv
           uv pip install --python .venv\Scripts\python.exe `
               build setuptools wheel packaging xmltodict validators numpy cmake
 

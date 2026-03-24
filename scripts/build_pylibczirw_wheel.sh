@@ -20,6 +20,11 @@ PYTHON="${2:-python3.14}"
 WORKDIR="/tmp/pylibczirw-build-$$"
 OUTDIR="${3:-$(pwd)/dist}"
 
+cleanup() {
+    rm -rf "${WORKDIR}"
+}
+trap cleanup EXIT
+
 echo "Building pylibCZIrw ${VERSION} wheel for $("${PYTHON}" --version)"
 echo "Output directory: ${OUTDIR}"
 
@@ -31,7 +36,7 @@ git clone --recursive --branch "v${VERSION}" --depth 1 \
 cd "${WORKDIR}"
 
 # Set version in setup.py (semantic-release sets this in CI)
-sed -i "s/VERSION = \"0.0.0\"/VERSION = \"${VERSION}\"/" setup.py
+sed -i.bak "s/VERSION = \"0.0.0\"/VERSION = \"${VERSION}\"/" setup.py && rm -f setup.py.bak
 
 # Create virtual environment
 echo "Creating build environment..."
@@ -47,9 +52,7 @@ echo "Building wheel..."
 mkdir -p "${OUTDIR}"
 cp dist/*.whl "${OUTDIR}/"
 
-WHEEL_NAME="$(basename dist/*.whl)"
+set -- dist/*.whl
+WHEEL_NAME="$(basename "$1")"
 echo ""
 echo "Success! Built: ${OUTDIR}/${WHEEL_NAME}"
-
-# Cleanup
-rm -rf "${WORKDIR}"
