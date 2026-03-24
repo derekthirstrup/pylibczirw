@@ -11,6 +11,10 @@ Files: hooks/*
 Copyright: 2024 Carl Zeiss Microscopy GmbH
 License: CC0-1.0
 
+Files: scripts/*
+Copyright: 2024 Carl Zeiss Microscopy GmbH
+License: CC0-1.0
+
 Files: templates/*
 Copyright: 2024 Carl Zeiss Microscopy GmbH
 License: CC0-1.0
