@@ -121,6 +121,11 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage reports to Codecov
+        if: success() || failure()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
   PackageWheelsNonPure:
     name: Package Non-pure Wheels for ${{ matrix.config.OS }}
     runs-on: ${{ matrix.config.PoolImage }}

@@ -1,0 +1,104 @@
+---
+name: Build Python 3.14 Wheels
+
+on:
+  workflow_dispatch:  # checkov:skip=CKV_GHA_7:Version input is required to select which release to build
+    inputs:
+      version:
+        description: "pylibCZIrw version to build"
+        required: true
+        default: "6.0.1"
+
+permissions: {}
+
+env:
+  PYTHON_VERSION: "cpython-3.14.0rc2"
+
+jobs:
+  build-linux:
+    name: Build Linux x86_64 wheel
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PYLIBCZIRW_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install Python 3.14
+        run: uv python install "$PYTHON_VERSION"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libssl-dev zlib1g-dev
+
+      - name: Build wheel
+        run: |
+          chmod +x scripts/build_pylibczirw_wheel.sh
+          ./scripts/build_pylibczirw_wheel.sh "${PYLIBCZIRW_VERSION}" python3.14
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pylibCZIrw-linux-cp314-wheel
+          path: dist/*.whl
+
+  build-windows:
+    name: Build Windows x64 wheel
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    env:
+      PYLIBCZIRW_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install Python 3.14
+        run: uv python install "$env:PYTHON_VERSION"
+
+      - name: Setup vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+          C:\vcpkg\bootstrap-vcpkg.bat
+          echo "VCPKG_INSTALLATION_ROOT=C:\vcpkg" >> $env:GITHUB_ENV
+
+      - name: Clone and build pylibCZIrw
+        shell: pwsh
+        run: |
+          $version = $env:PYLIBCZIRW_VERSION
+          $workdir = "$env:RUNNER_TEMP\pylibczirw-build"
+
+          Write-Host "Building pylibCZIrw $version for Python 3.14"
+
+          git clone --recursive --branch "v$version" --depth 1 `
+              https://github.com/ZEISS/pylibczirw.git "$workdir"
+
+          Set-Location "$workdir"
+
+          # Set version in setup.py
+          (Get-Content setup.py) -replace 'VERSION = "0.0.0"', "VERSION = `"$version`"" | Set-Content setup.py
+
+          # Create venv and install deps
+          uv venv --python="$env:PYTHON_VERSION" .venv
+          uv pip install --python .venv\Scripts\python.exe `
+              build setuptools wheel packaging xmltodict validators numpy cmake
+
+          # Build
+          .venv\Scripts\python.exe -m build --wheel
+
+          # Copy output
+          New-Item -ItemType Directory -Force -Path "$env:GITHUB_WORKSPACE\dist"
+          Copy-Item dist\*.whl "$env:GITHUB_WORKSPACE\dist\"
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pylibCZIrw-windows-cp314-wheel
+          path: dist/*.whl
