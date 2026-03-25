@@ -102,3 +102,33 @@ jobs:
         with:
           name: pylibCZIrw-windows-cp314-wheel
           path: dist/*.whl
+
+  build-macos:
+    name: Build macOS arm64 wheel
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    env:
+      PYLIBCZIRW_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install Python 3.14
+        run: uv python install "$PYTHON_VERSION"
+
+      - name: Install build dependencies
+        run: brew install cmake
+
+      - name: Build wheel
+        run: |
+          chmod +x scripts/build_pylibczirw_wheel.sh
+          ./scripts/build_pylibczirw_wheel.sh "${PYLIBCZIRW_VERSION}" python3.14
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pylibCZIrw-macos-cp314-wheel
+          path: dist/*.whl
