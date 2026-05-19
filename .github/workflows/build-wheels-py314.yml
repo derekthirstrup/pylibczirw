@@ -53,6 +53,11 @@ jobs:
           cd "$workdir"
           # Stamp the fork-local version (PEP 440 local label) into setup.py.
           sed -i.bak "s/VERSION = \"0.0.0\"/VERSION = \"$PYLIBCZIRW_FORK_VERSION\"/" setup.py
+          # CMake's project(VERSION x) only accepts numeric M.m.p[.t] — the
+          # PEP 440 local label "+py314.fork" is invalid there. Pass the
+          # base version (everything before the "+") to CMake while leaving
+          # setuptools' VERSION (used for wheel metadata + filename) intact.
+          sed -i.bak 's|"-DPYLIBCZIRW_VERSION=" + VERSION|"-DPYLIBCZIRW_VERSION=" + VERSION.split("+", 1)[0]|' setup.py
           rm -f setup.py.bak
           uv venv --python="$PYTHON_VERSION" .venv
           uv pip install --python .venv/bin/python \
@@ -80,7 +85,7 @@ jobs:
               "$GITHUB_WORKSPACE"/dist/*.whl
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/smoke-venv/bin/python" -I -c \
-              "import pylibCZIrw; from pylibCZIrw import czi_reader; print(czi_reader.__name__)"
+              "import _pylibCZIrw; from pylibCZIrw import czi; print(_pylibCZIrw.__name__, czi.__name__)"
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
@@ -136,6 +141,10 @@ jobs:
           Set-Location "$workdir"
 
           (Get-Content setup.py) -replace 'VERSION = "0.0.0"', "VERSION = `"$version`"" | Set-Content setup.py
+          # CMake project(VERSION) only accepts numeric M.m.p[.t]; strip the
+          # PEP 440 local label when constructing the CMake -D arg while
+          # keeping setuptools' VERSION (and wheel filename) intact.
+          (Get-Content setup.py) -replace [regex]::Escape('"-DPYLIBCZIRW_VERSION=" + VERSION'), '"-DPYLIBCZIRW_VERSION=" + VERSION.split("+", 1)[0]' | Set-Content setup.py
 
           uv venv --python="$env:PYTHON_VERSION" .venv
           uv pip install --python .venv\Scripts\python.exe `
@@ -154,7 +163,7 @@ jobs:
           uv pip install --python "$env:RUNNER_TEMP\smoke-venv\Scripts\python.exe" "$wheel"
           Push-Location $env:RUNNER_TEMP
           & "$env:RUNNER_TEMP\smoke-venv\Scripts\python.exe" -I -c `
-              "import pylibCZIrw; from pylibCZIrw import czi_reader; print(czi_reader.__name__)"
+              "import _pylibCZIrw; from pylibCZIrw import czi; print(_pylibCZIrw.__name__, czi.__name__)"
           Pop-Location
 
       - name: Upload wheel artifact
@@ -202,6 +211,8 @@ jobs:
               https://github.com/ZEISS/pylibczirw.git "$workdir"
           cd "$workdir"
           sed -i.bak "s/VERSION = \"0.0.0\"/VERSION = \"$PYLIBCZIRW_FORK_VERSION\"/" setup.py
+          # See linux job: CMake project(VERSION) needs the numeric base only.
+          sed -i.bak 's|"-DPYLIBCZIRW_VERSION=" + VERSION|"-DPYLIBCZIRW_VERSION=" + VERSION.split("+", 1)[0]|' setup.py
           rm -f setup.py.bak
           uv venv --python="$PYTHON_VERSION" .venv
           uv pip install --python .venv/bin/python \
@@ -218,7 +229,7 @@ jobs:
               "$GITHUB_WORKSPACE"/dist/*.whl
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/smoke-venv/bin/python" -I -c \
-              "import pylibCZIrw; from pylibCZIrw import czi_reader; print(czi_reader.__name__)"
+              "import _pylibCZIrw; from pylibCZIrw import czi; print(_pylibCZIrw.__name__, czi.__name__)"
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
