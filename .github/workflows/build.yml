@@ -35,8 +35,13 @@ jobs:
     # Needs to run on ubuntu
     runs-on: ubuntu-latest
     # If conditional based on https://github.com/actions/runner/issues/491#issuecomment-850884422
+    # The repository guard prevents this from firing on the
+    # derekthirstrup/pylibczirw fork — only ZEISS/pylibczirw has a configured
+    # PyPI trusted publisher; on the fork the request fails with
+    # `invalid-publisher`.
     if: |
       always() &&
+      github.repository == 'ZEISS/pylibczirw' &&
       github.event_name != 'pull_request' &&
       needs.build.result == 'success' &&
       needs.build.outputs.pypi_released == 'true'
