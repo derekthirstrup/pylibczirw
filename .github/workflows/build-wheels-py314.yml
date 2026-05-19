@@ -85,7 +85,7 @@ jobs:
               "$GITHUB_WORKSPACE"/dist/*.whl
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/smoke-venv/bin/python" -I -c \
-              "import pylibCZIrw; from pylibCZIrw import czi_reader; print(czi_reader.__name__)"
+              "import _pylibCZIrw; from pylibCZIrw import czi; print(_pylibCZIrw.__name__, czi.__name__)"
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
@@ -163,7 +163,7 @@ jobs:
           uv pip install --python "$env:RUNNER_TEMP\smoke-venv\Scripts\python.exe" "$wheel"
           Push-Location $env:RUNNER_TEMP
           & "$env:RUNNER_TEMP\smoke-venv\Scripts\python.exe" -I -c `
-              "import pylibCZIrw; from pylibCZIrw import czi_reader; print(czi_reader.__name__)"
+              "import _pylibCZIrw; from pylibCZIrw import czi; print(_pylibCZIrw.__name__, czi.__name__)"
           Pop-Location
 
       - name: Upload wheel artifact
@@ -229,7 +229,7 @@ jobs:
               "$GITHUB_WORKSPACE"/dist/*.whl
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/smoke-venv/bin/python" -I -c \
-              "import pylibCZIrw; from pylibCZIrw import czi_reader; print(czi_reader.__name__)"
+              "import _pylibCZIrw; from pylibCZIrw import czi; print(_pylibCZIrw.__name__, czi.__name__)"
 
       - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
